@@ -1,5 +1,4 @@
-import pytest
-from datetime import datetime
+import pytest  # noqa: F401
 
 from mcp_server import query_equipment, search_sop, get_production_stats
 from mcp_server import EquipmentQueryParams, SOPSearchParams, ProductionStatsParams

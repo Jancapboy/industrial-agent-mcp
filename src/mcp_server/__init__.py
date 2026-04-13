@@ -19,8 +19,6 @@ from mcp.types import (
     Resource,
     Tool,
     TextContent,
-    ImageContent,
-    EmbeddedResource,
 )
 from pydantic import BaseModel, Field
 
