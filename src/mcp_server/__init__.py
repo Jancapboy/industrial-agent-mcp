@@ -12,16 +12,15 @@ import asyncio
 from datetime import datetime
 from typing import Literal
 
-from mcp.server.models import InitializationOptions
 from mcp.server import NotificationOptions, Server
+from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
     Resource,
-    Tool,
     TextContent,
+    Tool,
 )
 from pydantic import BaseModel, Field
-
 
 # ─────────────────────────────────────────────────────────
 # Mock data stores (replace with real DB/API connections)
@@ -164,7 +163,10 @@ def query_equipment(params: EquipmentQueryParams) -> dict:
         return {
             "error": f"Equipment '{params.equipment_type}' on '{params.line_id}' not found.",
             "available_lines": list(EQUIPMENT_DB.keys()),
-            "available_types": list(next(iter(EQUIPMENT_DB.values())).keys()) if EQUIPMENT_DB else [],
+            "available_types": (
+                list(next(iter(EQUIPMENT_DB.values())).keys())
+                if EQUIPMENT_DB else []
+            ),
         }
 
     data = line[params.equipment_type]
@@ -269,7 +271,10 @@ def get_production_stats(params: ProductionStatsParams) -> dict:
                 "output": sdata["output"],
                 "defects": sdata["defects"],
                 "downtime_min": sdata["downtime_min"],
-                "defect_rate_percent": round(sdata["defects"] / sdata["output"] * 100, 2) if sdata["output"] else 0.0,
+                "defect_rate_percent": (
+                    round(sdata["defects"] / sdata["output"] * 100, 2)
+                    if sdata["output"] else 0.0
+                ),
             })
 
     defect_rate = (
