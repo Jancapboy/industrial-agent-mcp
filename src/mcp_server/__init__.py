@@ -129,6 +129,7 @@ PRODUCTION_DB = {
 # Pydantic models for tool parameters
 # ─────────────────────────────────────────────────────────
 
+
 class EquipmentQueryParams(BaseModel):
     line_id: str = Field(description="Production line identifier, e.g. LINE_A01")
     equipment_type: Literal["cnc", "assembly", "welding", "conveyor"] = Field(
@@ -139,22 +140,21 @@ class EquipmentQueryParams(BaseModel):
 class SOPSearchParams(BaseModel):
     keyword: str = Field(description="Search keyword for SOP title or keywords")
     category: Literal["operation", "safety", "maintenance", "quality", "all"] = Field(
-        default="all",
-        description="SOP category filter"
+        default="all", description="SOP category filter"
     )
 
 
 class ProductionStatsParams(BaseModel):
     date: str = Field(description="Date in YYYY-MM-DD format")
     shift: Literal["morning", "afternoon", "night", "all"] = Field(
-        default="all",
-        description="Shift filter"
+        default="all", description="Shift filter"
     )
 
 
 # ─────────────────────────────────────────────────────────
 # Tool implementations
 # ─────────────────────────────────────────────────────────
+
 
 def query_equipment(params: EquipmentQueryParams) -> dict:
     """Query real-time equipment status with AI-augmented diagnostics."""
@@ -164,8 +164,7 @@ def query_equipment(params: EquipmentQueryParams) -> dict:
             "error": f"Equipment '{params.equipment_type}' on '{params.line_id}' not found.",
             "available_lines": list(EQUIPMENT_DB.keys()),
             "available_types": (
-                list(next(iter(EQUIPMENT_DB.values())).keys())
-                if EQUIPMENT_DB else []
+                list(next(iter(EQUIPMENT_DB.values())).keys()) if EQUIPMENT_DB else []
             ),
         }
 
@@ -219,9 +218,8 @@ def search_sop(params: SOPSearchParams) -> dict:
     for sop in SOP_DB:
         if params.category != "all" and sop["category"] != params.category:
             continue
-        match = (
-            keyword_lower in sop["title"].lower()
-            or any(keyword_lower in k.lower() for k in sop["keywords"])
+        match = keyword_lower in sop["title"].lower() or any(
+            keyword_lower in k.lower() for k in sop["keywords"]
         )
         if match:
             results.append(sop)
@@ -266,20 +264,21 @@ def get_production_stats(params: ProductionStatsParams) -> dict:
             total_output += sdata["output"]
             total_defects += sdata["defects"]
             total_downtime += sdata["downtime_min"]
-            shift_breakdown.append({
-                "shift": shift,
-                "output": sdata["output"],
-                "defects": sdata["defects"],
-                "downtime_min": sdata["downtime_min"],
-                "defect_rate_percent": (
-                    round(sdata["defects"] / sdata["output"] * 100, 2)
-                    if sdata["output"] else 0.0
-                ),
-            })
+            shift_breakdown.append(
+                {
+                    "shift": shift,
+                    "output": sdata["output"],
+                    "defects": sdata["defects"],
+                    "downtime_min": sdata["downtime_min"],
+                    "defect_rate_percent": (
+                        round(sdata["defects"] / sdata["output"] * 100, 2)
+                        if sdata["output"]
+                        else 0.0
+                    ),
+                }
+            )
 
-    defect_rate = (
-        round(total_defects / total_output * 100, 2) if total_output else 0.0
-    )
+    defect_rate = round(total_defects / total_output * 100, 2) if total_output else 0.0
 
     result = {
         "date": params.date,
